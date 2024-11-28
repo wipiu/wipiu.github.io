@@ -7,20 +7,14 @@
 </head>
 <body>
     <h1>개인 메모장</h1>
-    <div id="board">
-        <h2>게시판</h2>
-        <div id="posts"></div>
-    </div>
     <div id="new-post">
         <h2>글쓰기</h2>
         <textarea id="post-content" placeholder="내용을 입력하세요..."></textarea>
         <button id="submit-btn">작성하기</button>
     </div>
-    <div id="update-post">
-        <h2>게시글 수정</h2>
-        <input type="number" id="post-id" placeholder="게시글 ID" />
-        <textarea id="update-content" placeholder="수정할 내용을 입력하세요..."></textarea>
-        <button id="update-btn">수정하기</button>
+    <div id="posts">
+        <h2>게시글 목록</h2>
+        <div id="post-list"></div>
     </div>
     <script>
         // 게시글 추가 함수
@@ -46,53 +40,33 @@
             }
         }
 
-        // 게시글 수정 함수
-        async function updatePost(id, content) {
+        // 게시글 목록 로드 함수
+        async function loadPosts() {
             try {
-                const response = await fetch(`http://localhost:3000/posts/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ content }),
+                const response = await fetch('http://localhost:3000/posts');
+                const posts = await response.json();
+                const postListDiv = document.getElementById('post-list');
+                postListDiv.innerHTML = ''; // 기존 게시글 초기화
+
+                posts.forEach(post => {
+                    const postElement = document.createElement('div');
+                    postElement.textContent = `ID: ${post.id}, 내용: ${post.content}`;
+                    postListDiv.appendChild(postElement);
                 });
-
-                if (!response.ok) {
-                    throw new Error('게시글 수정에 실패했습니다.');
-                }
-
-                const updatedPost = await response.json();
-                console.log('수정된 게시글:', updatedPost);
-                loadPosts(); // 게시글 목록 새로고침
             } catch (error) {
-                console.error('문제가 발생했습니다:', error);
+                console.error('게시글을 불러오는 데 문제가 발생했습니다:', error);
             }
         }
 
-        // 게시글 목록 로드 함수
-        async function loadPosts() {
-            const response = await fetch('http://localhost:3000/posts');
-            const posts = await response.json();
-            const postsDiv = document.getElementById('posts');
-            postsDiv.innerHTML = ''; // 기존 게시글 초기화
-
-            posts.forEach(post => {
-                const postElement = document.createElement('div');
-                postElement.textContent = `ID: ${post.id}, 내용: ${post.content}`;
-                postsDiv.appendChild(postElement);
-            });
-        }
-
-        // 이벤트 리스너 추가
+        // 버튼 클릭 이벤트 리스너 추가
         document.getElementById('submit-btn').addEventListener('click', () => {
             const content = document.getElementById('post-content').value;
-            addPost(content);
-        });
-
-        document.getElementById('update-btn').addEventListener('click', () => {
-            const id = document.getElementById('post-id').value;
-            const content = document.getElementById('update-content').value;
-            updatePost(id, content);
+            if (content) { // 내용이 있을 경우에만 추가
+                addPost(content);
+                document.getElementById('post-content').value = ''; // 입력 후 텍스트 영역 초기화
+            } else {
+                alert('내용을 입력하세요!'); // 내용이 비어있을 때 경고
+            }
         });
 
         // 페이지 로드 시 게시글 목록 불러오기
