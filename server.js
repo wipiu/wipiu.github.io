@@ -3,17 +3,17 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const app = express();
-const PORT = 4000;
+const PORT = 3000; // 서버가 사용할 포트 번호
 
-// 미들웨어 설정
-app.use(cors());
-app.use(bodyParser.json());
+app.use(cors()); // CORS 미들웨어 사용
+app.use(bodyParser.json()); // JSON 본문 파싱
 
 let posts = []; // 게시글을 저장할 배열
 
 // GET 요청: 모든 게시글 가져오기
 app.get('/posts', (req, res) => {
-    res.json(posts);
+    console.log('GET /posts 요청이 들어왔습니다.'); // 로그 추가
+    res.json(posts); // 게시글 배열 반환
 });
 
 // POST 요청: 새로운 게시글 추가하기
