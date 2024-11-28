@@ -11,7 +11,7 @@ document.getElementById('submit-btn').addEventListener('click', function() {
 });
 
 async function loadPosts() {
-    const response = await fetch('http://localhost:3000/posts');
+    const response = await fetch('http://localhost:4000/posts');
     const posts = await response.json();
     const postsContainer = document.getElementById('posts');
     postsContainer.innerHTML = '';
